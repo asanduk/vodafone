@@ -11,7 +11,7 @@
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "true",
-        "APP_URL": "https://yourprojectdomain.com",
+        "APP_URL": "hhttps://jobify-fargos-projects.vercel.app",
         "APP_KEY":"base64:xbIqwAQKsq9OdHOea2RiaFCk+ngaAL6+wyF12V4bdpI=",
 
         "APP_CONFIG_CACHE": "/tmp/config.php",
