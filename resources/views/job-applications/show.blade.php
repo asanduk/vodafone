@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Başvuru Detayları') }}
+            {{ __('Application Details') }}
         </h2>
     </x-slot>
 
@@ -10,49 +10,49 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                 <table class="table-auto w-full mb-6">
                     <tr>
-                        <th class="text-left px-4 py-2">Pozisyon:</th>
+                        <th class="text-left px-4 py-2">Position:</th>
                         <td class="text-left px-4 py-2">{{ $jobApplication->position }}</td>
                     </tr>
                     <tr>
-                        <th class="text-left px-4 py-2">Şirket Adı:</th>
+                        <th class="text-left px-4 py-2">Company Name:</th>
                         <td class="text-left px-4 py-2">{{ $jobApplication->company_name }}</td>
                     </tr>
                     <tr>
-                        <th class="text-left px-4 py-2">Başvuru Tarihi:</th>
+                        <th class="text-left px-4 py-2">Application Date:</th>
                         <td class="text-left px-4 py-2">{{ $jobApplication->applied_at }}</td>
                     </tr>
                     <tr>
-                        <th class="text-left px-4 py-2">Durum:</th>
+                        <th class="text-left px-4 py-2">Status:</th>
                         <td class="text-left px-4 py-2">{{ ucfirst($jobApplication->status) }}</td>
                     </tr>
                     <tr>
-                        <th class="text-left px-4 py-2">İş İlanı Linki:</th>
+                        <th class="text-left px-4 py-2">Job Listing URL:</th>
                         <td class="text-left px-4 py-2">
                             @if($jobApplication->job_listing_url)
-                                <a href="{{ $jobApplication->job_listing_url }}" class="text-blue-500 hover:underline" target="_blank">İş İlanına Git</a>
+                                <a href="{{ $jobApplication->job_listing_url }}" class="text-blue-500 hover:underline" target="_blank">Go to Job Listing</a>
                             @else
-                                Yok
+                                None
                             @endif
                         </td>
                     </tr>
                     <tr>
-                        <th class="text-left px-4 py-2">Firma Web Sitesi:</th>
+                        <th class="text-left px-4 py-2">Company Website:</th>
                         <td class="text-left px-4 py-2">
                             @if($jobApplication->company_website_url)
-                                <a href="{{ $jobApplication->company_website_url }}" class="text-blue-500 hover:underline" target="_blank">Web Sitesine Git</a>
+                                <a href="{{ $jobApplication->company_website_url }}" class="text-blue-500 hover:underline" target="_blank">Go to Website</a>
                             @else
-                                Yok
+                                None
                             @endif
                         </td>
                     </tr>
                     <tr>
-                        <th class="text-left px-4 py-2">Notlar:</th>
+                        <th class="text-left px-4 py-2">Notes:</th>
                         <td class="text-left px-4 py-2">{{ $jobApplication->notes }}</td>
                     </tr>
                 </table>
 
                 <a href="{{ route('job-applications.edit', $jobApplication->id) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
-                    Düzenle
+                    Edit
                 </a>
             </div>
         </div>
