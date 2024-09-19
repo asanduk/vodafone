@@ -24,6 +24,7 @@ class JobApplicationController extends Controller
                             return $query->where('position', 'like', "%$search%")
                                          ->orWhere('company_name', 'like', "%$search%");
                         })
+                        ->orderBy('applied_at', 'desc')  // Add this line
                         ->paginate(10);
         
         return view('job-applications.index', compact('applications', 'status', 'search'));
