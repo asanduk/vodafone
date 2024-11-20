@@ -28,8 +28,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Pending Applications -->
                 <a href="{{ route('job-applications.index', ['status' => 'pending']) }}" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
-                    <div class="flex items-center justify-center w-full h-48 md:h-auto md:w-48 bg-blue-200 rounded-t-lg p-4">
-                        <i class="fas fa-clock fa-3x text-blue-600"></i>
+                    <div class="flex items-center justify-center w-full h-48 md:h-auto md:w-48 bg-blue-200 rounded-t-lg">
+                        <i class="fas fa-clock fa-3x text-blue-600 mb-2"></i>
                     </div>
                     <div class="flex flex-col justify-between p-4 leading-normal">
                         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Pending Applications</h5>
@@ -39,8 +39,8 @@
 
                 <!-- Invited for Interview Applications -->
                 <a href="{{ route('job-applications.index', ['status' => 'interview']) }}" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
-                    <div class="flex items-center justify-center w-full h-48 md:h-auto md:w-48 bg-green-200 rounded-t-lg p-4">
-                        <i class="fas fa-user-check fa-3x text-green-600"></i>
+                    <div class="flex items-center justify-center w-full h-48 md:h-auto md:w-48 bg-green-200 rounded-t-lg">
+                        <i class="fas fa-user-check fa-3x text-green-600 mb-2"></i>
                     </div>
                     <div class="flex flex-col justify-between p-4 leading-normal">
                         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Invited for Interview</h5>
@@ -50,8 +50,8 @@
 
                 <!-- Rejected Applications -->
                 <a href="{{ route('job-applications.index', ['status' => 'rejected']) }}" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
-                    <div class="flex items-center justify-center w-full h-48 md:h-auto md:w-48 bg-red-200 rounded-t-lg p-4">
-                        <i class="fas fa-times-circle fa-3x text-red-600"></i>
+                    <div class="flex items-center justify-center w-full h-48 md:h-auto md:w-48 bg-red-200 rounded-t-lg">
+                        <i class="fas fa-times-circle fa-3x text-red-600 mb-2"></i>
                     </div>
                     <div class="flex flex-col justify-between p-4 leading-normal">
                         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Rejected Applications</h5>
@@ -61,8 +61,8 @@
 
                 <!-- Offer Received Applications -->
                 <a href="{{ route('job-applications.index', ['status' => 'offered']) }}" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
-                    <div class="flex items-center justify-center w-full h-48 md:h-auto md:w-48 bg-yellow-200 rounded-t-lg p-4">
-                        <i class="fas fa-trophy fa-3x text-black"></i>
+                    <div class="flex items-center justify-center w-full h-48 md:h-auto md:w-48 bg-yellow-200 rounded-t-lg">
+                        <i class="fas fa-trophy fa-3x text-black mb-2"></i>
                     </div>
                     <div class="flex flex-col justify-between p-4 leading-normal">
                         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Offer Received</h5>
@@ -73,12 +73,12 @@
 
             <!-- Manage Job Applications and Add New Application Buttons -->
             <div class="mt-8 flex space-x-4">
-                <a href="{{ route('job-applications.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-edit"></i> Manage Job Applications
+                <a href="{{ route('job-applications.index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Manage Job Applications
                 </a>
                 
-                <a href="{{ route('job-applications.create') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-plus"></i> Add New Job Application
+                <a href="{{ route('job-applications.create') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Add New Job Application
                 </a>
             </div>
 

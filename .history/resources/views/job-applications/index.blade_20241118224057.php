@@ -11,12 +11,16 @@
                 <!-- "Add New Application" and "Download as Excel" Buttons Side by Side -->
                 <div class="flex space-x-4 mb-6">
                     <a href="{{ route('job-applications.create') }}" class="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition">
-                        <i class="fas fa-plus mr-2"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
                         Add New Application
                     </a>
 
                     <a href="{{ route('job-applications.export') }}" class="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
-                        <i class="fas fa-file-excel mr-2"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16l9 9 9-9m-9-3V3"/>
+                        </svg>
                         Download as Excel
                     </a>
                 </div>
@@ -25,8 +29,7 @@
                 <form method="GET" action="{{ route('job-applications.index') }}" class="mb-6">
                     <label for="search" class="block text-gray-700 mb-2">Search:</label>
                     <input type="text" name="search" id="search" class="form-control w-full mb-4" value="{{ request('search') }}">
-                    <button type="submit" class="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        <i class="fas fa-search mr-2"></i>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Search
                     </button>
                 </form>
@@ -40,8 +43,7 @@
                         <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
                         <option value="offered" {{ request('status') == 'offered' ? 'selected' : '' }}>Offer Received</option>
                     </select>
-                    <button type="submit" class="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        <i class="fas fa-filter mr-2"></i>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Filter
                     </button>
                 </form>
@@ -49,14 +51,14 @@
                 <!-- Application List -->
                 @if($applications->count() > 0)
                     <div class="overflow-x-auto">
-                        <table class="min-w-full table-auto bg-white rounded-lg shadow" style="table-layout: fixed;">
+                        <table class="min-w-full table-auto bg-white rounded-lg shadow">
                             <thead class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                                 <tr>
-                                    <th class="py-3 px-6 text-left" style="width: 25%;">Position</th>
-                                    <th class="py-3 px-6 text-left" style="width: 20%;">Company</th>
-                                    <th class="py-3 px-6 text-left" style="width: 20%;">Application Date</th>
-                                    <th class="py-3 px-6 text-left" style="width: 20%;">Status</th>
-                                    <th class="py-3 px-6 text-left" style="width: 15%;">Actions</th>
+                                    <th class="py-3 px-6 text-left">Position</th>
+                                    <th class="py-3 px-6 text-left">Company</th>
+                                    <th class="py-3 px-6 text-left">Application Date</th>
+                                    <th class="py-3 px-6 text-left">Status</th>
+                                    <th class="py-3 px-6 text-left">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-700 text-sm font-light">
@@ -90,7 +92,7 @@
                                                 </a>
                                             </div>
                                             <div class="relative inline-block">
-                                                <button onclick="openModal({{ $application->id }})" class="text-red-500 hover:underline ml-4 group" title="Delete">
+                                                <button onclick="openModal({{ $application->id }})" class="text-red-500 hover:underline group" title="Delete">
                                                     <i class="fas fa-trash"></i>
                                                     <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Delete</span>
                                                 </button>

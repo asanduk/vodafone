@@ -24,6 +24,12 @@
                 </p>
             </div>
 
+            <!-- Yeni İstatistik Grafiği -->
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4">Aylara Göre Başvuru Sayıları</h3>
+                <canvas id="applicationsChart"></canvas>
+            </div>
+
             <!-- Statistic Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Pending Applications -->
@@ -73,15 +79,40 @@
 
             <!-- Manage Job Applications and Add New Application Buttons -->
             <div class="mt-8 flex space-x-4">
-                <a href="{{ route('job-applications.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-edit"></i> Manage Job Applications
+                <a href="{{ route('job-applications.index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Manage Job Applications
                 </a>
                 
-                <a href="{{ route('job-applications.create') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-plus"></i> Add New Job Application
+                <a href="{{ route('job-applications.create') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Add New Job Application
                 </a>
             </div>
 
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('applicationsChart').getContext('2d');
+        const applicationsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+                datasets: [{
+                    label: 'Başvuru Sayıları',
+                    data: [{{ $applicationsByMonth }}], // Burada aylara göre başvuru sayılarınızı geçirin
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </x-app-layout>

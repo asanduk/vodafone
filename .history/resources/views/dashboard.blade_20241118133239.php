@@ -2,7 +2,6 @@
     <x-slot name="header">
             {{ __('Dashboard') }}
         </h2>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     </x-slot>
 
     <div class="py-12">
@@ -73,12 +72,12 @@
 
             <!-- Manage Job Applications and Add New Application Buttons -->
             <div class="mt-8 flex space-x-4">
-                <a href="{{ route('job-applications.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-edit"></i> Manage Job Applications
+                <a href="{{ route('job-applications.index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Manage Job Applications
                 </a>
                 
-                <a href="{{ route('job-applications.create') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-plus"></i> Add New Job Application
+                <a href="{{ route('job-applications.create') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Add New Job Application
                 </a>
             </div>
 

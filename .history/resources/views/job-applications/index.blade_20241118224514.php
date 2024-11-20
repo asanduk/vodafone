@@ -11,12 +11,16 @@
                 <!-- "Add New Application" and "Download as Excel" Buttons Side by Side -->
                 <div class="flex space-x-4 mb-6">
                     <a href="{{ route('job-applications.create') }}" class="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition">
-                        <i class="fas fa-plus mr-2"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
                         Add New Application
                     </a>
 
                     <a href="{{ route('job-applications.export') }}" class="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
-                        <i class="fas fa-file-excel mr-2"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16l9 9 9-9m-9-3V3"/>
+                        </svg>
                         Download as Excel
                     </a>
                 </div>
@@ -25,8 +29,7 @@
                 <form method="GET" action="{{ route('job-applications.index') }}" class="mb-6">
                     <label for="search" class="block text-gray-700 mb-2">Search:</label>
                     <input type="text" name="search" id="search" class="form-control w-full mb-4" value="{{ request('search') }}">
-                    <button type="submit" class="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        <i class="fas fa-search mr-2"></i>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Search
                     </button>
                 </form>
@@ -40,8 +43,7 @@
                         <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
                         <option value="offered" {{ request('status') == 'offered' ? 'selected' : '' }}>Offer Received</option>
                     </select>
-                    <button type="submit" class="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        <i class="fas fa-filter mr-2"></i>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Filter
                     </button>
                 </form>

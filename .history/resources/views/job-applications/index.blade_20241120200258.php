@@ -78,21 +78,18 @@
                                         </td>
                                         <td class="py-3 px-6 text-left">
                                             <div class="relative inline-block">
-                                                <a href="{{ route('job-applications.show', $application->id) }}" class="text-blue-500 hover:underline group" title="Details">
+                                                <a href="{{ route('job-applications.show', $application->id) }}" class="text-gray-800 hover:underline group" title="Details">
                                                     <i class="fas fa-eye"></i>
-                                                    <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Details</span>
                                                 </a>
                                             </div>
                                             <div class="relative inline-block">
-                                                <a href="{{ route('job-applications.edit', $application->id) }}" class="text-yellow-500 hover:underline ml-4 group" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                    <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Edit</span>
+                                                <a href="{{ route('job-applications.edit', $application->id) }}" class="text-gray-800 hover:underline ml-4 group" title="Edit">
+                                                    <i class="fas fa-pencil-alt"></i>
                                                 </a>
                                             </div>
                                             <div class="relative inline-block">
-                                                <button onclick="openModal({{ $application->id }})" class="text-red-500 hover:underline ml-4 group" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                    <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Delete</span>
+                                                <button onclick="openModal({{ $application->id }})" class="text-gray-800 hover:underline ml-4 group" title="Delete">
+                                                    <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </div>
                                             <!-- Modal -->

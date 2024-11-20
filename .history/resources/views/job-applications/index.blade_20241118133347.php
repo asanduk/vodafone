@@ -3,6 +3,9 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Job Applications') }}
         </h2>
+
+
+
     </x-slot>
 
     <div class="py-12">
@@ -11,12 +14,16 @@
                 <!-- "Add New Application" and "Download as Excel" Buttons Side by Side -->
                 <div class="flex space-x-4 mb-6">
                     <a href="{{ route('job-applications.create') }}" class="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition">
-                        <i class="fas fa-plus mr-2"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
                         Add New Application
                     </a>
 
                     <a href="{{ route('job-applications.export') }}" class="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
-                        <i class="fas fa-file-excel mr-2"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16l9 9 9-9m-9-3V3"/>
+                        </svg>
                         Download as Excel
                     </a>
                 </div>
@@ -25,8 +32,7 @@
                 <form method="GET" action="{{ route('job-applications.index') }}" class="mb-6">
                     <label for="search" class="block text-gray-700 mb-2">Search:</label>
                     <input type="text" name="search" id="search" class="form-control w-full mb-4" value="{{ request('search') }}">
-                    <button type="submit" class="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        <i class="fas fa-search mr-2"></i>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Search
                     </button>
                 </form>
@@ -40,8 +46,7 @@
                         <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
                         <option value="offered" {{ request('status') == 'offered' ? 'selected' : '' }}>Offer Received</option>
                     </select>
-                    <button type="submit" class="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        <i class="fas fa-filter mr-2"></i>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Filter
                     </button>
                 </form>
@@ -49,14 +54,14 @@
                 <!-- Application List -->
                 @if($applications->count() > 0)
                     <div class="overflow-x-auto">
-                        <table class="min-w-full table-auto bg-white rounded-lg shadow" style="table-layout: fixed;">
+                        <table class="min-w-full table-auto bg-white rounded-lg shadow">
                             <thead class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                                 <tr>
-                                    <th class="py-3 px-6 text-left" style="width: 25%;">Position</th>
-                                    <th class="py-3 px-6 text-left" style="width: 20%;">Company</th>
-                                    <th class="py-3 px-6 text-left" style="width: 20%;">Application Date</th>
-                                    <th class="py-3 px-6 text-left" style="width: 20%;">Status</th>
-                                    <th class="py-3 px-6 text-left" style="width: 15%;">Actions</th>
+                                    <th class="py-3 px-6 text-left">Position</th>
+                                    <th class="py-3 px-6 text-left">Company</th>
+                                    <th class="py-3 px-6 text-left">Application Date</th>
+                                    <th class="py-3 px-6 text-left">Status</th>
+                                    <th class="py-3 px-6 text-left">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-700 text-sm font-light">
@@ -76,49 +81,25 @@
                                                 <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded">Offer Received</span>
                                             @endif
                                         </td>
-                                        <td class="py-3 px-6 text-left">
-                                            <div class="relative inline-block">
-                                                <a href="{{ route('job-applications.show', $application->id) }}" class="text-blue-500 hover:underline group" title="Details">
-                                                    <i class="fas fa-eye"></i>
-                                                    <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Details</span>
+                                        <td class="py-3 px-6 text-left flex space-x-4">
+                                            <div class="relative group">
+                                                <a href="{{ route('job-applications.show', $application->id) }}" class="text-blue-500 hover:text-blue-700">
+                                                    <i class="fas fa-eye"></i> <!-- Details icon -->
                                                 </a>
+                                                <span class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 w-max bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Details</span>
                                             </div>
-                                            <div class="relative inline-block">
-                                                <a href="{{ route('job-applications.edit', $application->id) }}" class="text-yellow-500 hover:underline ml-4 group" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                    <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Edit</span>
+                                            <div class="relative group">
+                                                <a href="{{ route('job-applications.edit', $application->id) }}" class="text-yellow-500 hover:text-yellow-700">
+                                                    <i class="fas fa-edit"></i> <!-- Edit icon -->
                                                 </a>
+                                                <span class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 w-max bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Edit</span>
                                             </div>
-                                            <div class="relative inline-block">
-                                                <button onclick="openModal({{ $application->id }})" class="text-red-500 hover:underline ml-4 group" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                    <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Delete</span>
+                                            <div class="relative group">
+                                                <button onclick="openModal('{{ $application->id }}')" class="text-red-500 hover:text-red-700">
+                                                    <i class="fas fa-trash"></i> <!-- Delete icon -->
                                                 </button>
+                                                <span class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 w-max bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Delete</span>
                                             </div>
-                                            <!-- Modal -->
-                                            <div id="modal-{{ $application->id }}" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-                                                <div class="bg-black opacity-50 absolute inset-0"></div>
-                                                <div class="bg-white rounded-lg p-6 z-10">
-                                                    <h3 class="text-lg font-semibold mb-4">Confirm Deletion</h3>
-                                                    <p>Are you sure you want to delete this application?</p>
-                                                    <div class="mt-4">
-                                                        <form action="{{ route('job-applications.destroy', $application->id) }}" method="POST" class="inline-block">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="bg-red-500 text-white font-bold py-2 px-4 rounded">Delete</button>
-                                                        </form>
-                                                        <button onclick="closeModal({{ $application->id }})" class="ml-4 bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded">Cancel</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <script>
-                                                function openModal(id) {
-                                                    document.getElementById('modal-' + id).classList.remove('hidden');
-                                                }
-                                                function closeModal(id) {
-                                                    document.getElementById('modal-' + id).classList.add('hidden');
-                                                }
-                                            </script>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -130,10 +111,40 @@
                     <div class="mt-4">
                         {{ $applications->appends(request()->input())->links() }}
                     </div>
+
+                    <!-- Delete Confirmation Modal -->
+                    <div id="deleteModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+                        <div class="bg-white rounded-lg p-6 w-1/3">
+                            <h3 class="text-lg font-semibold mb-4">Are you sure you want to delete this application?</h3>
+                            <div class="flex justify-end">
+                                <button id="cancelButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-2" onclick="closeModal()">Cancel</button>
+                                <form id="deleteForm" method="POST" class="inline-block">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                 @else
                     <p>No applications found.</p>
                 @endif
             </div>
         </div>
     </div>
+
+    <script>
+        let currentApplicationId = null;
+
+        function openModal(applicationId) {
+            currentApplicationId = applicationId;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteForm').action = `/job-applications/${applicationId}`;
+        }
+
+        function closeModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+    </script>
 </x-app-layout>

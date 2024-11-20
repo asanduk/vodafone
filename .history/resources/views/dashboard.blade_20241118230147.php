@@ -3,6 +3,7 @@
             {{ __('Dashboard') }}
         </h2>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </x-slot>
 
     <div class="py-12">
@@ -71,14 +72,48 @@
                 </a>
             </div>
 
+            <!-- Aylara Göre Başvuru Sayıları Grafiği -->
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4">Aylara Göre Başvuru Sayıları</h3>
+                <canvas id="applicationsChart"></canvas>
+            </div>
+
+            <script>
+                const ctx = document.getElementById('applicationsChart').getContext('2d');
+                const applicationsByMonth = @json($applicationsByMonth);
+                const months = Object.keys(applicationsByMonth);
+                const counts = Object.values(applicationsByMonth);
+
+                const applicationsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months.map(month => month + ' Ay'),
+                        datasets: [{
+                            label: 'Başvuru Sayısı',
+                            data: counts,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            </script>
+
             <!-- Manage Job Applications and Add New Application Buttons -->
             <div class="mt-8 flex space-x-4">
-                <a href="{{ route('job-applications.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-edit"></i> Manage Job Applications
+                <a href="{{ route('job-applications.index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Manage Job Applications
                 </a>
                 
-                <a href="{{ route('job-applications.create') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-plus"></i> Add New Job Application
+                <a href="{{ route('job-applications.create') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Add New Job Application
                 </a>
             </div>
 

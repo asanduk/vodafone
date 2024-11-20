@@ -13,13 +13,13 @@
 
                     <div class="form-group mb-4">
                         <label for="position" class="block text-gray-700 font-medium">Position Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="position" id="position" class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" required maxlength="100">
+                        <input type="text" name="position" id="position" class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" required maxlength="100" placeholder="Position name">
                         <small class="text-gray-500">Max 100 characters</small>
                     </div>
 
                     <div class="form-group mb-4">
                         <label for="company_name" class="block text-gray-700 font-medium">Company Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="company_name" id="company_name" class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" required maxlength="100">
+                        <input type="text" name="company_name" id="company_name" class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" required maxlength="100" placeholder="Company name">
                         <small class="text-gray-500">Max 100 characters</small>
                     </div>
 
@@ -40,19 +40,19 @@
 
                     <div class="form-group mb-4">
                         <label for="job_listing_url" class="block text-gray-700 font-medium">Job Listing URL</label>
-                        <input type="url" name="job_listing_url" id="job_listing_url" class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" maxlength="512">
+                        <input type="url" name="job_listing_url" id="job_listing_url" class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" maxlength="512" placeholder="Job listing URL">
                         <small class="text-gray-500">Max 512 characters</small>
                     </div>
 
                     <div class="form-group mb-4">
                         <label for="company_website_url" class="block text-gray-700 font-medium">Company Website</label>
-                        <input type="url" name="company_website_url" id="company_website_url" class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" maxlength="512">
+                        <input type="url" name="company_website_url" id="company_website_url" class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" maxlength="512" placeholder="Company website">
                         <small class="text-gray-500">Max 512 characters</small>
                     </div>
 
                     <div class="form-group mb-4">
                         <label for="notes" class="block text-gray-700 font-medium">Notes</label>
-                        <textarea name="notes" id="notes" class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" maxlength="2000"></textarea>
+                        <textarea name="notes" id="notes" class="form-control w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" maxlength="2000" placeholder="Enter your notes here..."></textarea>
                         <small class="text-gray-500">Max 2000 characters</small>
                     </div>
 
