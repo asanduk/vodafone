@@ -58,8 +58,7 @@ class DashboardController extends Controller
             DB::raw('COUNT(*) as count')
         )
         ->where('user_id', auth()->id())
-        ->whereYear('applied_at', Carbon::now()->year)
-        ->orWhereYear('applied_at', Carbon::now()->year - 1)
+        ->where('applied_at', '>=', Carbon::now()->subMonths(6))
         ->groupBy('month')
         ->orderBy('month')
         ->get();

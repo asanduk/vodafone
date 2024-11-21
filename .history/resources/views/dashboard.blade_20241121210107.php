@@ -206,7 +206,7 @@
 
                     <!-- Monthly Statistics Tab -->
                     <div id="monthly-stats" class="statistics-panel hidden">
-                        <p class="text-gray-600 mb-4">Monthly statistics for the last two years are displayed here.</p>
+                        <p class="text-gray-600 mb-4">Son iki yıla ait aylık istatistikler gösterilmektedir.</p>
                         <div id="monthlyStats"></div>
                     </div>
                 </div>

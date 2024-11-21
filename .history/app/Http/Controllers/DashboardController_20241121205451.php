@@ -58,8 +58,7 @@ class DashboardController extends Controller
             DB::raw('COUNT(*) as count')
         )
         ->where('user_id', auth()->id())
-        ->whereYear('applied_at', Carbon::now()->year)
-        ->orWhereYear('applied_at', Carbon::now()->year - 1)
+        ->where('applied_at', '>=', Carbon::now()->subMonths(6))
         ->groupBy('month')
         ->orderBy('month')
         ->get();
@@ -70,6 +69,24 @@ class DashboardController extends Controller
         });
         $monthlyData = $monthlyStats->pluck('count');
 
+        // Get yearly statistics for the last 6 years
+        $yearlyStats = JobApplication::select(
+            DB::raw('YEAR(applied_at) as year'),
+            DB::raw('MONTH(applied_at) as month'),
+            DB::raw('COUNT(*) as count')
+        )
+        ->where('user_id', auth()->id())
+        ->where('applied_at', '>=', Carbon::now()->subYears(6))
+        ->groupBy('year', 'month')
+        ->orderBy('year', 'month')
+        ->get();
+
+        // Prepare data for the chart
+        $yearlyLabels = $yearlyStats->map(function($stat) {
+            return Carbon::createFromFormat('Y-m', $stat->year . '-' . $stat->month)->format('F Y');
+        });
+        $yearlyData = $yearlyStats->pluck('count');
+
         return view('dashboard', compact(
             'pendingCount',
             'interviewCount',
@@ -79,7 +96,9 @@ class DashboardController extends Controller
             'monthlyData',
             'responseRate',
             'totalApplications',
-            'respondedApplications'
+            'respondedApplications',
+            'yearlyLabels',
+            'yearlyData'
         ));
     }
 }
