@@ -13,7 +13,7 @@ class JobApplicationController extends Controller
     // Başvuruları listeleme
     public function index(Request $request)
     {
-        $query = JobApplication::where('user_id', Auth::id());//user_id'si Auth::id() olan başvuruları getir
+        $query = JobApplication::where('user_id', Auth::id());
 
         // Search functionality
         if ($request->has('search')) {
