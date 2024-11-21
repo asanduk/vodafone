@@ -158,9 +158,7 @@
                             </thead>
                             <tbody class="text-gray-700 text-sm font-light">
                                 @foreach($applications as $application)
-                                    <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" 
-                                        onclick="window.location.href='{{ route('job-applications.show', $application->id) }}'"
-                                        data-href="{{ route('job-applications.show', $application->id) }}">
+                                    <tr class="border-b border-gray-200 hover:bg-gray-100">
                                         <td class="py-3 px-6 text-left">{{ $application->position }}</td>
                                         <td class="py-3 px-6 text-left">{{ $application->company_name }}</td>
                                         <td class="py-3 px-6 text-left">{{ $application->applied_at }}</td>
@@ -175,7 +173,7 @@
                                                 <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded">Offer Received</span>
                                             @endif
                                         </td>
-                                        <td class="py-3 px-6 text-left" onclick="event.stopPropagation()">
+                                        <td class="py-3 px-6 text-left">
                                             <div class="md:relative md:inline-block">
                                                 <!-- Desktop View -->
                                                 <div class="hidden md:block">

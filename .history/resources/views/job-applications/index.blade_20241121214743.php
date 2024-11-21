@@ -158,9 +158,7 @@
                             </thead>
                             <tbody class="text-gray-700 text-sm font-light">
                                 @foreach($applications as $application)
-                                    <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" 
-                                        onclick="window.location.href='{{ route('job-applications.show', $application->id) }}'"
-                                        data-href="{{ route('job-applications.show', $application->id) }}">
+                                    <tr class="border-b border-gray-200 hover:bg-gray-100">
                                         <td class="py-3 px-6 text-left">{{ $application->position }}</td>
                                         <td class="py-3 px-6 text-left">{{ $application->company_name }}</td>
                                         <td class="py-3 px-6 text-left">{{ $application->applied_at }}</td>
@@ -175,44 +173,25 @@
                                                 <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded">Offer Received</span>
                                             @endif
                                         </td>
-                                        <td class="py-3 px-6 text-left" onclick="event.stopPropagation()">
-                                            <div class="md:relative md:inline-block">
-                                                <!-- Desktop View -->
-                                                <div class="hidden md:block">
-                                                    <div class="relative inline-block">
-                                                        <a href="{{ route('job-applications.show', $application->id) }}" class="text-blue-500 hover:underline group" title="Details">
-                                                            <i class="fas fa-eye"></i>
-                                                            <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Details</span>
-                                                        </a>
-                                                    </div>
-                                                    <div class="relative inline-block">
-                                                        <a href="{{ route('job-applications.edit', $application->id) }}" class="text-yellow-500 hover:underline ml-4 group" title="Edit">
-                                                            <i class="fas fa-edit"></i>
-                                                            <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Edit</span>
-                                                        </a>
-                                                    </div>
-                                                    <div class="relative inline-block">
-                                                        <button onclick="openModal({{ $application->id }})" class="text-red-500 hover:underline ml-4 group" title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                            <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Delete</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Mobile View -->
-                                                <div class="md:hidden space-y-2">
-                                                    <a href="{{ route('job-applications.show', $application->id) }}" class="block text-blue-500 hover:underline">
-                                                        Details
-                                                    </a>
-                                                    <a href="{{ route('job-applications.edit', $application->id) }}" class="block text-yellow-500 hover:underline">
-                                                        Edit
-                                                    </a>
-                                                    <button onclick="openModal({{ $application->id }})" class="block text-red-500 hover:underline text-left">
-                                                        Delete
-                                                    </button>
-                                                </div>
+                                        <td class="py-3 px-6 text-left">
+                                            <div class="relative inline-block">
+                                                <a href="{{ route('job-applications.show', $application->id) }}" class="text-blue-500 hover:underline group" title="Details">
+                                                    <i class="fas fa-eye"></i>
+                                                    <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Details</span>
+                                                </a>
                                             </div>
-
+                                            <div class="relative inline-block">
+                                                <a href="{{ route('job-applications.edit', $application->id) }}" class="text-yellow-500 hover:underline ml-4 group" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                    <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Edit</span>
+                                                </a>
+                                            </div>
+                                            <div class="relative inline-block">
+                                                <button onclick="openModal({{ $application->id }})" class="text-red-500 hover:underline ml-4 group" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                    <span class="absolute left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Delete</span>
+                                                </button>
+                                            </div>
                                             <!-- Modal -->
                                             <div id="modal-{{ $application->id }}" class="fixed inset-0 flex items-center justify-center z-50 hidden">
                                                 <div class="bg-black opacity-50 absolute inset-0"></div>
