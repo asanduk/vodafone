@@ -13,31 +13,21 @@ class JobApplicationController extends Controller
     // Başvuruları listeleme
     public function index(Request $request)
     {
-        $query = JobApplication::query();
-
-        // Search functionality
-        if ($request->has('search')) {
-            $search = $request->get('search');
-            $query->where(function($q) use ($search) {
-                $q->where('position', 'like', "%{$search}%")
-                  ->orWhere('company_name', 'like', "%{$search}%");
-            });
-        }
-
-        // Status filter
-        if ($request->has('status') && $request->status != '') {
-            $query->where('status', $request->status);
-        }
-
-        // Sorting
-        $sort = $request->query('sort', 'applied_at'); // Default sort by applied_at
-        $direction = $request->query('direction', 'desc'); // Default direction is descending
-
-        $query->orderBy($sort, $direction);
-
-        $applications = $query->paginate(10);
+        $status = $request->get('status');
+        $search = $request->get('search');
+    
+        $applications = Auth::user()->jobApplications()
+                        ->when($status, function ($query, $status) {
+                            return $query->where('status', $status);
+                        })
+                        ->when($search, function ($query, $search) {
+                            return $query->where('position', 'like', "%$search%")
+                                         ->orWhere('company_name', 'like', "%$search%");
+                        })
+                        ->orderBy('applied_at', 'desc')  // Add this line
+                        ->paginate(10);
         
-        return view('job-applications.index', compact('applications'));
+        return view('job-applications.index', compact('applications', 'status', 'search'));
     }
 
     // Yeni başvuru formu

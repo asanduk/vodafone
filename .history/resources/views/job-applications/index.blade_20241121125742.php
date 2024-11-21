@@ -105,16 +105,25 @@
                                         </a>
                                     </th>
                                     <th class="py-3 px-6 text-left" style="width: 20%;">
-                                        <a href="{{ route('job-applications.index', array_merge(request()->query(), ['sort' => 'applied_at', 'direction' => request()->query('sort') == 'applied_at' && request()->query('direction') == 'asc' ? 'desc' : 'asc'])) }}" class="flex items-center group">
-                                            Application Date
-                                            <span class="ml-1">
-                                                @if(request()->query('sort') == 'applied_at')
-                                                    <i class="fas fa-sort-{{ request()->query('direction') == 'asc' ? 'up' : 'down' }}"></i>
-                                                @else
-                                                    <i class="fas fa-sort text-gray-400 group-hover:text-gray-600"></i>
-                                                @endif
-                                            </span>
-                                        </a>
+                                        <div class="flex items-center justify-between">
+                                            <a href="{{ route('job-applications.index', array_merge(request()->query(), ['sort' => 'applied_at', 'direction' => request()->query('sort') == 'applied_at' && request()->query('direction') == 'asc' ? 'desc' : 'asc'])) }}" class="flex items-center group">
+                                                Application Date
+                                                <span class="ml-1">
+                                                    @if(request()->query('sort') == 'applied_at')
+                                                        <i class="fas fa-sort-{{ request()->query('direction') == 'asc' ? 'up' : 'down' }}"></i>
+                                                    @else
+                                                        <i class="fas fa-sort text-gray-400 group-hover:text-gray-600"></i>
+                                                    @endif
+                                                </span>
+                                            </a>
+                                            @if(request()->has('sort') || request()->has('direction'))
+                                                <a href="{{ route('job-applications.index') }}" 
+                                                   class="text-gray-400 hover:text-gray-600 ml-2" 
+                                                   title="Reset to default sorting">
+                                                    <i class="fas fa-undo-alt text-sm"></i>
+                                                </a>
+                                            @endif
+                                        </div>
                                     </th>
                                     <th class="py-3 px-6 text-left relative" style="width: 20%;">
                                         <div class="inline-block">

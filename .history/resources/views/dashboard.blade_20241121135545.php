@@ -9,17 +9,29 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- General Information Content -->
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mb-8">
-                <h3 class="text-lg font-semibold mb-4">Welcome!</h3>
-                <p class="text-gray-700 mb-4">
+                <h3 class="text-lg font-semibold mb-4 text-center">Welcome!</h3>
+                <p class="text-gray-700 mb-4 text-center">
                     This application helps you track and manage your job applications. You can start using the application with the following steps:
                 </p>
-                <ul class="list-disc list-inside text-gray-700 mb-4">
-                    <li><strong>Add New Job Application:</strong> You can add new applications for positions you've applied to.</li>
-                    <li><strong>Manage Your Applications:</strong> You can update the status of your applications, add notes, and review application details.</li>
-                    <li><strong>Status Tracking:</strong> You can track the status of your applications (pending, invited for interview, rejected, offer received).</li>
-                    <li><strong>Export to Excel:</strong> You can export all your applications in Excel format.</li>
+                <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <strong>Add New Job Application:</strong> You can add new applications for positions you've applied to.
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <strong>Manage Your Applications:</strong> You can update the status of your applications, add notes, and review application details.
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <strong>Status Tracking:</strong> You can track the status of your applications (pending, invited for interview, rejected, offer received).
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <strong>Export to Excel:</strong> You can export all your applications in Excel format.
+                    </li>
                 </ul>
-                <p class="text-gray-700">
+                <p class="text-gray-700 text-center">
                     You can get an overview of your applications from the statistics below. Also, you can use the relevant buttons to add new applications or manage your existing applications.
                 </p>
 

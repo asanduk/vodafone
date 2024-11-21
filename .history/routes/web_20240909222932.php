@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,5 +24,3 @@ Route::middleware([
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('job-applications', JobApplicationController::class);
 });
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

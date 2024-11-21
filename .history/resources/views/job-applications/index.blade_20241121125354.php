@@ -46,34 +46,6 @@
                     </button>
                 </form>
 
-                <!-- Table Info Section -->
-                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 flex justify-between items-center">
-                    <div class="flex items-center">
-                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-                        <div>
-                            <p class="text-sm text-blue-700">
-                                Default sorting is by application date (newest first). 
-                                @if(request()->has('sort'))
-                                    Currently sorted by: <span class="font-semibold">{{ ucfirst(request()->query('sort')) }}</span>
-                                    ({{ request()->query('direction') == 'asc' ? 'A-Z' : 'Z-A' }})
-                                @endif
-                            </p>
-                            @if(request()->has('status'))
-                                <p class="text-sm text-blue-700 mt-1">
-                                    Filtered by status: <span class="font-semibold">{{ ucfirst(request()->query('status')) }}</span>
-                                </p>
-                            @endif
-                        </div>
-                    </div>
-                    @if(request()->has('sort') || request()->has('status') || request()->has('search'))
-                        <a href="{{ route('job-applications.index') }}" 
-                           class="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200">
-                            <i class="fas fa-undo-alt mr-1"></i>
-                            Reset to default
-                        </a>
-                    @endif
-                </div>
-
                 <!-- Application List -->
                 @if($applications->count() > 0)
                     <div class="overflow-x-auto">
@@ -233,36 +205,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function toggleStatusDropdown() {
-            const dropdown = document.getElementById('statusDropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
-        // Sayfa herhangi bir yerine tıklandığında dropdown'ı kapat
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('statusDropdown');
-            const button = event.target.closest('button');
-            
-            if (!button && !dropdown.classList.contains('hidden')) {
-                dropdown.classList.add('hidden');
-            }
-        });
-    </script>
-
-    <style>
-        .dropdown-active {
-            background-color: #f3f4f6;
-        }
-        
-        #statusDropdown {
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            border: 1px solid #e5e7eb;
-        }
-        
-        #statusDropdown a:hover {
-            background-color: #f3f4f6;
-        }
-    </style>
 </x-app-layout>

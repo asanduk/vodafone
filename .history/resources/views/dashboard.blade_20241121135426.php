@@ -15,9 +15,11 @@
                 </p>
                 <ul class="list-disc list-inside text-gray-700 mb-4">
                     <li><strong>Add New Job Application:</strong> You can add new applications for positions you've applied to.</li>
-                    <li><strong>Manage Your Applications:</strong> You can update the status of your applications, add notes, and review application details.</li>
-                    <li><strong>Status Tracking:</strong> You can track the status of your applications (pending, invited for interview, rejected, offer received).</li>
-                    <li><strong>Export to Excel:</strong> You can export all your applications in Excel format.</li>
+                    <li><strong>Manage Your Applications:</strong> Update the status of your applications, add notes, and review details.</li>
+                    <li><strong>Status Tracking:</strong> Track the status of your applications (pending, interview, rejected, offered).</li>
+                    <li><strong>Export to Excel:</strong> Export all your applications in Excel format.</li>
+                    <li><strong>Get Insights:</strong> Analyze your application trends and improve your job search strategy.</li>
+                    <li><strong>Set Reminders:</strong> Keep track of important deadlines and follow-ups for your applications.</li>
                 </ul>
                 <p class="text-gray-700">
                     You can get an overview of your applications from the statistics below. Also, you can use the relevant buttons to add new applications or manage your existing applications.
