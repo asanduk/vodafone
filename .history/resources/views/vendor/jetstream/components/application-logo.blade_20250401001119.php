@@ -1,0 +1,1 @@
+<img src="{{ asset('images/vodafone-logo.png') }}" alt="Vodafone" {{ $attributes }}> 

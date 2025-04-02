@@ -1,0 +1,95 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Vertrag Bearbeiten') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                <form action="{{ route('contracts.update', $contract) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Kategorie -->
+                        <div>
+                            <x-label for="category_id" value="{{ __('Hauptkategorie') }}" />
+                            <select name="category_id" id="category_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                @foreach($mainCategories as $category)
+                                    <option value="{{ $category->id }}" {{ $contract->category_id == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Unterkategorie -->
+                        <div>
+                            <x-label for="subcategory_id" value="{{ __('Unterkategorie') }}" />
+                            <select name="subcategory_id" id="subcategory_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                @foreach($subcategories as $subcategory)
+                                    <option value="{{ $subcategory->id }}" {{ $contract->subcategory_id == $subcategory->id ? 'selected' : '' }}>
+                                        {{ $subcategory->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Vertragsnummer -->
+                        <div>
+                            <x-label for="contract_number" value="{{ __('Vertragsnummer') }}" />
+                            <x-input id="contract_number" type="text" name="contract_number" :value="$contract->contract_number" class="mt-1 block w-full" required />
+                        </div>
+
+                        <!-- Kundenname -->
+                        <div>
+                            <x-label for="customer_name" value="{{ __('Kundenname') }}" />
+                            <x-input id="customer_name" type="text" name="customer_name" :value="$contract->customer_name" class="mt-1 block w-full" required />
+                        </div>
+
+                        <!-- Provision -->
+                        <div>
+                            <x-label for="commission_amount" value="{{ __('Provision (€)') }}" />
+                            <x-input id="commission_amount" type="number" step="0.01" name="commission_amount" :value="$contract->commission_amount" class="mt-1 block w-full" required />
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mt-6 space-x-3">
+                        <x-button type="button" class="bg-gray-500" onclick="window.history.back()">
+                            {{ __('Abbrechen') }}
+                        </x-button>
+                        <x-button class="bg-red-600">
+                            {{ __('Änderungen Speichern') }}
+                        </x-button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        document.getElementById('category_id').addEventListener('change', function() {
+            const categoryId = this.value;
+            const subcategorySelect = document.getElementById('subcategory_id');
+            
+            subcategorySelect.innerHTML = '<option value="">Unterkategorie wählen</option>';
+            
+            if (categoryId) {
+                fetch(`/categories/${categoryId}/subcategories`)
+                    .then(response => response.json())
+                    .then(subcategories => {
+                        subcategories.forEach(subcategory => {
+                            const option = document.createElement('option');
+                            option.value = subcategory.id;
+                            option.textContent = subcategory.name;
+                            subcategorySelect.appendChild(option);
+                        });
+                    });
+            }
+        });
+    </script>
+    @endpush
+</x-app-layout> 
