@@ -110,8 +110,9 @@ class ContractController extends Controller
             $validated['user_id'] = auth()->id();
 
             // Komisyonu hesapla
-            $subcategory = Category::findOrFail($request->subcategory_id);
-            $commission = ($subcategory->base_commission * $subcategory->commission_rate / 100);
+            $subcategory = Category::with('parent')->findOrFail($request->subcategory_id);
+            // Alt kategorinin base_commission'ını üst kategorinin commission_rate'i ile çarp
+            $commission = ($subcategory->base_commission * $subcategory->parent->commission_rate / 100);
             
             // Yeni sözleşme oluştur
             $contract = new Contract();
@@ -170,8 +171,8 @@ class ContractController extends Controller
         ]);
 
         // Recalculate commission based on new subcategory
-        $subcategory = Category::findOrFail($request->subcategory_id);
-        $validated['commission_amount'] = ($subcategory->base_commission * $subcategory->commission_rate / 100);
+        $subcategory = Category::with('parent')->findOrFail($request->subcategory_id);
+        $validated['commission_amount'] = ($subcategory->base_commission * $subcategory->parent->commission_rate / 100);
 
         $contract->update($validated);
 
@@ -263,12 +264,12 @@ class ContractController extends Controller
         $subcategories = Category::where('parent_id', $category->id)
             ->withCount('contracts')
             ->get()
-            ->map(function ($subcategory) {
+            ->map(function ($subcategory) use ($category) {
                 return [
                     'id' => $subcategory->id,
                     'name' => $subcategory->name,
                     'base_commission' => $subcategory->base_commission,
-                    'commission_rate' => $subcategory->commission_rate,
+                    'commission_rate' => $category->commission_rate, // Üst kategorinin commission_rate'ini döndür
                     'usage_count' => $subcategory->contracts_count
                 ];
             });
@@ -278,6 +279,15 @@ class ContractController extends Controller
 
     public function getCommission(Category $category)
     {
+        // Eğer bu bir alt kategori ise, parent'ın commission_rate'ini döndür
+        if ($category->parent_id) {
+            return response()->json([
+                'base_commission' => $category->base_commission,
+                'commission_rate' => $category->parent->commission_rate
+            ]);
+        }
+        
+        // Ana kategori ise kendi commission_rate'ini döndür
         return response()->json([
             'base_commission' => $category->base_commission,
             'commission_rate' => $category->commission_rate
@@ -293,12 +303,12 @@ class ContractController extends Controller
             ->withCount('contracts')
             ->orderBy('usage_count', 'desc')
             ->get()
-            ->map(function ($subcategory) {
+            ->map(function ($subcategory) use ($category) {
                 return [
                     'id' => $subcategory->id,
                     'name' => $subcategory->name,
                     'base_commission' => $subcategory->base_commission,
-                    'commission_rate' => $subcategory->commission_rate,
+                    'commission_rate' => $category->commission_rate, // Üst kategorinin commission_rate'ini döndür
                     'usage_count' => $subcategory->contracts_count
                 ];
             });

@@ -25,8 +25,8 @@ class ContractSeeder extends Seeder
             $mainCategory = $mainCategories->random();
             $subcategory = $mainCategory->subcategories->random();
             
-            // Calculate commission based on subcategory rates
-            $commission = ($subcategory->base_commission * $subcategory->commission_rate / 100);
+            // Calculate commission based on parent category commission rate
+            $commission = ($subcategory->base_commission * $mainCategory->commission_rate / 100);
             
             // Generate a random date within the last year
             $date = Carbon::now()->subDays(rand(0, 365));
