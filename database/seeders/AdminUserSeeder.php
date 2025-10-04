@@ -10,41 +10,51 @@ class AdminUserSeeder extends Seeder
 {
     public function run()
     {
-        // Admin kullanıcı
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'asanduk@gmx.de',
-            'password' => Hash::make('password123'),
-            'is_admin' => true,
-        ]);
+        // Admin kullanıcı - sadece yoksa oluştur
+        User::firstOrCreate(
+            ['email' => 'asanduk@gmx.de'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password123'),
+                'is_admin' => true,
+            ]
+        );
 
-        // Normal kullanıcılar
-        User::create([
-            'name' => 'Max Mustermann',
-            'email' => 'max.mustermann@example.com',
-            'password' => Hash::make('password123'),
-            'is_admin' => false,
-        ]);
+        // Normal kullanıcılar - sadece yoksa oluştur
+        User::firstOrCreate(
+            ['email' => 'max.mustermann@example.com'],
+            [
+                'name' => 'Max Mustermann',
+                'password' => Hash::make('password123'),
+                'is_admin' => false,
+            ]
+        );
 
-        User::create([
-            'name' => 'Anna Schmidt',
-            'email' => 'anna.schmidt@example.com',
-            'password' => Hash::make('password123'),
-            'is_admin' => false,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'anna.schmidt@example.com'],
+            [
+                'name' => 'Anna Schmidt',
+                'password' => Hash::make('password123'),
+                'is_admin' => false,
+            ]
+        );
 
-        User::create([
-            'name' => 'Thomas Weber',
-            'email' => 'thomas.weber@example.com',
-            'password' => Hash::make('password123'),
-            'is_admin' => false,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'thomas.weber@example.com'],
+            [
+                'name' => 'Thomas Weber',
+                'password' => Hash::make('password123'),
+                'is_admin' => false,
+            ]
+        );
 
-        User::create([
-            'name' => 'Sarah Müller',
-            'email' => 'sarah.mueller@example.com',
-            'password' => Hash::make('password123'),
-            'is_admin' => false,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'sarah.mueller@example.com'],
+            [
+                'name' => 'Sarah Müller',
+                'password' => Hash::make('password123'),
+                'is_admin' => false,
+            ]
+        );
     }
 } 
