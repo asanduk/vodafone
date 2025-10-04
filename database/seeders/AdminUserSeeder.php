@@ -15,10 +15,11 @@ class AdminUserSeeder extends Seeder
             ['email' => 'asanduk@gmx.de'],
             [
                 'name' => 'Admin User',
-                'password' => Hash::make('password123'),
+                'password' => bcrypt('somepassword'),
                 'is_admin' => true,
             ]
         );
+        
 
         // Normal kullanıcılar - sadece yoksa oluştur
         User::firstOrCreate(
