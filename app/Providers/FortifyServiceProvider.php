@@ -28,6 +28,14 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Registration'ı kapat
+        Fortify::ignoreRoutes();
+        
+        // Sadece register route'unu kapat
+        Fortify::registerView(function () {
+            return redirect()->route('login');
+        });
+        
         Fortify::createUsersUsing(CreateNewUser::class);
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);

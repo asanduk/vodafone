@@ -36,11 +36,11 @@ class Contract extends Model
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class)->withTrashed();
     }
 
     public function subcategory()
     {
-        return $this->belongsTo(Category::class, 'subcategory_id');
+        return $this->belongsTo(Category::class, 'subcategory_id')->withTrashed();
     }
 } 

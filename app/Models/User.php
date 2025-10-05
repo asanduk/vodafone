@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
@@ -17,6 +18,7 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use SoftDeletes;
 
 
 
@@ -31,6 +33,12 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'branch',
+        'position',
+        'phone',
+        'address',
+        'is_active',
+        'last_login_at',
     ];
 
     /**
@@ -63,6 +71,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'is_admin' => 'boolean',
+        'is_active' => 'boolean',
+        'last_login_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function jobApplications()

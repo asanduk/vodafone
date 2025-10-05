@@ -17,18 +17,110 @@
             @endif
 
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                <!-- Kategori Ekleme Bölümü -->
+                <div class="mb-8 border border-gray-200 rounded-lg bg-blue-50">
+                    <button type="button" 
+                            class="toggle-add-section w-full text-left p-6 bg-blue-50 hover:bg-blue-100 transition-colors duration-200"
+                            style="border: none; cursor: pointer;">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-gray-800">Neuen Bereich hinzufügen</h3>
+                            <svg class="w-6 h-6 toggle-add-icon text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    
+                    <!-- Formlar (Başlangıçta gizli) -->
+                    <div id="add-section-forms" class="hidden px-6 pb-6">
+                    
+                    <!-- Ana Kategori Ekleme Formu -->
+                    <div class="mb-6 bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-semibold text-gray-700 mb-3">Hauptbereich hinzufügen</h4>
+                        <form id="add-main-category-form" action="{{ route('admin.categories.store') }}" method="POST" class="add-category-form">
+                            @csrf
+                            <div class="flex items-center gap-4">
+                                <input type="text" 
+                                       name="name" 
+                                       placeholder="Hauptbereich Name" 
+                                       class="flex-1 rounded border-gray-300"
+                                       required>
+                                <input type="number" 
+                                       name="commission_rate" 
+                                       placeholder="Provisionssatz (%)" 
+                                       class="w-32 rounded border-gray-300"
+                                       step="0.01"
+                                       min="0"
+                                       max="100">
+                                <button type="submit" 
+                                        class="bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                                        style="background-color: #2563eb; color: white; border: none; cursor: pointer;">
+                                    Hauptbereich hinzufügen
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Alt Kategori Ekleme Formu -->
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-semibold text-gray-700 mb-3">Unterbereich hinzufügen</h4>
+                        <form id="add-subcategory-form" action="{{ route('admin.categories.store') }}" method="POST" class="add-category-form">
+                            @csrf
+                            <div class="flex items-center gap-4">
+                                <select name="parent_id" 
+                                        class="w-48 rounded border-gray-300"
+                                        required>
+                                    <option value="">Hauptbereich wählen</option>
+                                    @foreach($mainCategories as $mainCategory)
+                                        <option value="{{ $mainCategory->id }}">{{ $mainCategory->name }}</option>
+                                    @endforeach
+                                </select>
+                                <input type="text" 
+                                       name="name" 
+                                       placeholder="Unterbereich Name" 
+                                       class="flex-1 rounded border-gray-300"
+                                       required>
+                                <input type="number" 
+                                       name="base_commission" 
+                                       placeholder="Grundprovision (€)" 
+                                       class="w-32 rounded border-gray-300"
+                                       step="0.01"
+                                       min="0">
+                                <button type="submit" 
+                                        class="bg-green-600 text-white font-bold py-2 px-4 rounded"
+                                        style="background-color: #16a34a; color: white; border: none; cursor: pointer;">
+                                    Unterbereich hinzufügen
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+
                 @foreach($mainCategories as $mainCategory)
                     <div class="mb-8 border border-gray-200 rounded-lg p-6 bg-gray-50">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold text-gray-800">{{ $mainCategory->name }}</h3>
-                            <button type="button" 
-                                    class="toggle-subcategories bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded flex items-center gap-2"
-                                    data-category-id="{{ $mainCategory->id }}">
-                                <span class="toggle-text">Produktname anzeigen</span>
-                                <svg class="w-5 h-5 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button type="button" 
+                                        class="delete-category bg-red-600 text-white font-semibold py-2 px-4 rounded flex items-center gap-2"
+                                        data-category-id="{{ $mainCategory->id }}"
+                                        data-category-name="{{ $mainCategory->name }}"
+                                        data-is-main="true"
+                                        style="background-color: #dc2626; color: white; border: none; cursor: pointer;">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Löschen
+                                </button>
+                                <button type="button" 
+                                        class="toggle-subcategories bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded flex items-center gap-2"
+                                        data-category-id="{{ $mainCategory->id }}">
+                                    <span class="toggle-text">Produktname anzeigen</span>
+                                    <svg class="w-5 h-5 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         
                         <!-- Main Category Commission Rate Form -->
@@ -62,7 +154,7 @@
                                 <thead>
                                     <tr class="bg-gray-100">
                                         <th class="px-4 py-2">Produktname</th>
-                                        <th class="px-4 py-2">Grundprovision</th>
+                                        <th class="px-4 py-2">Grundprovision (€)</th>
                                         <th class="px-4 py-2">Aktion</th>
                                     </tr>
                                 </thead>
@@ -85,10 +177,22 @@
                                                            min="0">
                                                 </td>
                                                 <td class="border px-4 py-2 text-center">
-                                                    <button type="submit" 
-                                                            class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                                        Speichern
-                                                    </button>
+                                                    <div class="flex items-center justify-center gap-2">
+                                                        <button type="submit" 
+                                                                class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                                            Speichern
+                                                        </button>
+                                                        <button type="button" 
+                                                                class="delete-category bg-red-800 text-white font-bold py-2 px-3 rounded flex items-center gap-1"
+                                                                data-category-id="{{ $subcategory->id }}"
+                                                                data-category-name="{{ $subcategory->name }}"
+                                                                data-is-main="false"
+                                                                style="background-color: #991b1b; color: white; border: none; cursor: pointer;">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </form>
                                         </tr>
@@ -98,6 +202,37 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- Silme Onay Modalı -->
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mt-4" id="modalTitle">Bereich löschen</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500" id="modalMessage">
+                        Sind Sie sicher, dass Sie diesen Bereich löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.
+                    </p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="confirmDelete" 
+                            class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300"
+                            style="background-color: #dc2626; color: white; border: none; cursor: pointer;">
+                        Ja, löschen
+                    </button>
+                    <button id="cancelDelete" 
+                            class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                            style="background-color: #6b7280; color: white; border: none; cursor: pointer;">
+                        Abbrechen
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -121,6 +256,64 @@
                         subcategoriesDiv.classList.add('hidden');
                         toggleIcon.style.transform = 'rotate(0deg)';
                         toggleText.textContent = 'Produktname anzeigen';
+                    }
+                });
+            });
+
+            // Toggle functionality for add section
+            document.querySelector('.toggle-add-section').addEventListener('click', function() {
+                const formsDiv = document.getElementById('add-section-forms');
+                const toggleIcon = this.querySelector('.toggle-add-icon');
+                
+                if (formsDiv.classList.contains('hidden')) {
+                    formsDiv.classList.remove('hidden');
+                    toggleIcon.style.transform = 'rotate(180deg)';
+                } else {
+                    formsDiv.classList.add('hidden');
+                    toggleIcon.style.transform = 'rotate(0deg)';
+                }
+            });
+
+            // Kategori ekleme formları için event listener'lar
+            const addCategoryForms = document.querySelectorAll('.add-category-form');
+            addCategoryForms.forEach(form => {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    console.log('Add category form submitted:', form.id);
+
+                    const formData = new FormData(form);
+
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        const data = await response.json();
+                        console.log('Add category response:', data);
+
+                        if (data.success) {
+                            // Form'u temizle
+                            form.reset();
+                            
+                            // Başarı mesajını göster
+                            showNotification(data.message, 'success');
+                            
+                            // Sayfayı yenile (yeni kategorileri göstermek için)
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            showNotification(data.message || 'Fehler beim Hinzufügen des Bereichs', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Add category error:', error);
+                        showNotification('Fehler beim Hinzufügen des Bereichs', 'error');
                     }
                 });
             });
@@ -205,6 +398,84 @@
                     }
                 });
             });
+        });
+
+        // Silme fonksiyonalitesi
+        let categoryToDelete = null;
+        
+        // Silme butonları için event listener
+        document.querySelectorAll('.delete-category').forEach(button => {
+            button.addEventListener('click', function() {
+                const categoryId = this.dataset.categoryId;
+                const categoryName = this.dataset.categoryName;
+                const isMain = this.dataset.isMain === 'true';
+                
+                categoryToDelete = { id: categoryId, name: categoryName, isMain: isMain };
+                
+                // Modal mesajını güncelle
+                const modalTitle = document.getElementById('modalTitle');
+                const modalMessage = document.getElementById('modalMessage');
+                
+                if (isMain) {
+                    modalTitle.textContent = 'Hauptbereich löschen';
+                    modalMessage.textContent = `Sind Sie sicher, dass Sie den Hauptbereich "${categoryName}" und alle seine Unterbereiche löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.`;
+                } else {
+                    modalTitle.textContent = 'Unterbereich löschen';
+                    modalMessage.textContent = `Sind Sie sicher, dass Sie den Unterbereich "${categoryName}" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.`;
+                }
+                
+                // Modal'ı göster
+                document.getElementById('deleteModal').classList.remove('hidden');
+            });
+        });
+        
+        // Onay butonu
+        document.getElementById('confirmDelete').addEventListener('click', async function() {
+            if (!categoryToDelete) return;
+            
+            try {
+                const response = await fetch(`/admin/categories/${categoryToDelete.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    // Modal'ı kapat
+                    document.getElementById('deleteModal').classList.add('hidden');
+                    // Sayfayı yenile
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showNotification(data.message || 'Fehler beim Löschen', 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                showNotification('Fehler beim Löschen', 'error');
+            }
+            
+            categoryToDelete = null;
+        });
+        
+        // İptal butonu
+        document.getElementById('cancelDelete').addEventListener('click', function() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            categoryToDelete = null;
+        });
+        
+        // Modal dışına tıklayınca kapat
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+                categoryToDelete = null;
+            }
         });
 
         // Bildirim gösterme fonksiyonu

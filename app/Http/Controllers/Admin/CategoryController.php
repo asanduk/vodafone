@@ -18,6 +18,46 @@ class CategoryController extends Controller
         return view('admin.categories.index', compact('mainCategories'));
     }
 
+    public function create()
+    {
+        $mainCategories = Category::whereNull('parent_id')->get();
+        return view('admin.categories.create', compact('mainCategories'));
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'parent_id' => 'nullable|exists:categories,id',
+                'commission_rate' => 'nullable|numeric|between:0,100',
+                'base_commission' => 'nullable|numeric|min:0'
+            ]);
+
+            $category = Category::create($validated);
+
+            return response()->json([
+                'success' => true,
+                'message' => $category->parent_id ? 
+                    "Unterbereich '{$category->name}' wurde erfolgreich hinzugefügt" : 
+                    "Hauptbereich '{$category->name}' wurde erfolgreich hinzugefügt",
+                'data' => $category
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Category creation failed', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Fehler: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function update(Request $request, Category $category)
     {
         \Log::info('Update request received', [
@@ -68,6 +108,40 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Fehler: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroy(Category $category)
+    {
+        try {
+            $categoryName = $category->name;
+            $isMainCategory = $category->parent_id === null;
+            
+            // Alt kategorileri de soft delete yap (cascade soft delete)
+            if ($isMainCategory) {
+                $category->subcategories()->delete();
+            }
+            
+            // Soft delete kullan
+            $category->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => $isMainCategory ? 
+                    "Hauptbereich '{$categoryName}' und alle Unterbereiche wurden erfolgreich gelöscht (Verträge bleiben erhalten)" : 
+                    "Unterbereich '{$categoryName}' wurde erfolgreich gelöscht (Verträge bleiben erhalten)"
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Category deletion failed', [
+                'error' => $e->getMessage(),
+                'category_id' => $category->id
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Fehler beim Löschen: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -7,11 +7,14 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ContractController extends Controller
 {
     public function index(Request $request)
     {
+        // Normal kullanıcılar sadece kendi contractlarını görebilir
+        // Admin kullanıcılar da sadece kendi contractlarını görebilir (admin paneli ayrı)
         $query = Contract::query()
             ->where('user_id', auth()->id())
             ->with(['category', 'subcategory']);
@@ -73,12 +76,6 @@ class ContractController extends Controller
                       ->orderBy('created_at', 'desc');
         }
 
-        // Debug için
-        \Log::info('SQL Query:', [
-            'sql' => $query->toSql(),
-            'bindings' => $query->getBindings()
-        ]);
-
         $contracts = $query->paginate(10)->withQueryString();
 
         return view('contracts.index', compact('contracts'));
@@ -86,7 +83,7 @@ class ContractController extends Controller
 
     public function create()
     {
-        // Ana kategorileri al (parent_id = null olanlar)
+        // Ana kategorileri al (parent_id = null olanlar) - sadece aktif olanlar
         $mainCategories = Category::whereNull('parent_id')->get();
         
         return view('contracts.create', compact('mainCategories'));
@@ -110,7 +107,7 @@ class ContractController extends Controller
             $validated['user_id'] = auth()->id();
 
             // Komisyonu hesapla
-            $subcategory = Category::with('parent')->findOrFail($request->subcategory_id);
+            $subcategory = Category::withTrashed()->with('parent')->findOrFail($request->subcategory_id);
             // Alt kategorinin base_commission'ını üst kategorinin commission_rate'i ile çarp
             $commission = ($subcategory->base_commission * $subcategory->parent->commission_rate / 100);
             
@@ -152,8 +149,12 @@ class ContractController extends Controller
     public function edit(Contract $contract)
     {
         $this->authorize('update', $contract);
+        
+        // Ana kategoriler - sadece aktif olanlar (yeni seçim için)
         $mainCategories = Category::whereNull('parent_id')->get();
-        $subcategories = Category::where('parent_id', $contract->category_id)->get();
+        
+        // Alt kategoriler - mevcut contract'ın kategorisi için (silinmiş olsa bile)
+        $subcategories = Category::withTrashed()->where('parent_id', $contract->category_id)->get();
         
         return view('contracts.edit', compact('contract', 'mainCategories', 'subcategories'));
     }
@@ -171,7 +172,7 @@ class ContractController extends Controller
         ]);
 
         // Recalculate commission based on new subcategory
-        $subcategory = Category::with('parent')->findOrFail($request->subcategory_id);
+            $subcategory = Category::withTrashed()->with('parent')->findOrFail($request->subcategory_id);
         $validated['commission_amount'] = ($subcategory->base_commission * $subcategory->parent->commission_rate / 100);
 
         $contract->update($validated);
@@ -192,12 +193,16 @@ class ContractController extends Controller
     public function dashboard()
     {
         try {
-            // Ana kategorileri ve sözleşme sayılarını al
-            $categories = Category::withCount(['contracts' => function($query) {
+            // Ana kategorileri ve sözleşme sayılarını al - sadece aktif olanlar veya contract'ı olan silinenler
+            $categories = Category::withTrashed()->withCount(['contracts' => function($query) {
                 $query->where('user_id', auth()->id());
             }])
             ->whereNull('parent_id')
-            ->get();
+            ->get()
+            ->filter(function($category) {
+                // Aktif kategorileri veya contract'ı olan silinen kategorileri göster
+                return $category->deleted_at === null || $category->contracts_count > 0;
+            });
 
             // Toplam komisyon
             $totalCommission = Contract::where('user_id', auth()->id())->sum('commission_amount') ?? 0;
@@ -243,6 +248,38 @@ class ContractController extends Controller
                 return Carbon::createFromFormat('Y-m', $month)->format('M Y');
             })->toArray();
 
+            // Overall statistics for all users (including admin)
+            $overallStats = [
+                'total_contracts' => Contract::count(),
+                'total_commission' => Contract::sum('commission_amount') ?? 0,
+                'daily_commission' => Contract::whereDate('contract_date', Carbon::today())->sum('commission_amount') ?? 0,
+                'weekly_commission' => Contract::whereBetween('contract_date', [
+                    Carbon::now()->startOfWeek(),
+                    Carbon::now()->endOfWeek()
+                ])->sum('commission_amount') ?? 0,
+                'monthly_commission' => Contract::whereMonth('contract_date', Carbon::now()->month)
+                    ->whereYear('contract_date', Carbon::now()->year)
+                    ->sum('commission_amount') ?? 0,
+                'yearly_commission' => Contract::whereYear('contract_date', Carbon::now()->year)
+                    ->sum('commission_amount') ?? 0,
+            ];
+
+            // Overall monthly stats for all users
+            $overallMonthlyStats = Contract::select(
+                DB::raw('DATE_FORMAT(contract_date, "%Y-%m") as month'),
+                DB::raw('COUNT(*) as total'),
+                DB::raw('SUM(commission_amount) as commission')
+            )
+                ->where('contract_date', '>=', Carbon::now()->subMonths(12))
+                ->groupBy('month')
+                ->orderBy('month')
+                ->get();
+
+            $overallMonthlyData = $overallMonthlyStats->pluck('total')->toArray();
+            $overallMonthlyLabels = $overallMonthlyStats->pluck('month')->map(function($month) {
+                return Carbon::createFromFormat('Y-m', $month)->format('M Y');
+            })->toArray();
+
             return view('dashboard', compact(
                 'categories',
                 'totalCommission',
@@ -251,7 +288,10 @@ class ContractController extends Controller
                 'monthlyCommission',
                 'yearlyCommission',
                 'monthlyData',
-                'monthlyLabels'
+                'monthlyLabels',
+                'overallStats',
+                'overallMonthlyData',
+                'overallMonthlyLabels'
             ));
         } catch (\Exception $e) {
             return view('dashboard')->with('error', 'Daten konnten nicht geladen werden.');
@@ -314,5 +354,43 @@ class ContractController extends Controller
             });
 
         return response()->json($subcategories);
+    }
+
+    // Normal kullanıcılar için export metodu
+    public function export()
+    {
+        $user = auth()->user();
+        
+        // Get all contracts with related data
+        $contracts = $user->contracts()
+            ->with(['category', 'subcategory'])
+            ->orderBy('contract_date', 'desc')
+            ->get();
+
+        // Calculate statistics
+        $stats = [
+            'total_contracts' => $contracts->count(),
+            'total_commission' => $contracts->sum('commission_amount'),
+            'monthly_commission' => $contracts->where('contract_date', '>=', now()->startOfMonth())->sum('commission_amount'),
+            'yearly_commission' => $contracts->where('contract_date', '>=', now()->startOfYear())->sum('commission_amount'),
+            'average_commission' => $contracts->avg('commission_amount'),
+            'highest_commission' => $contracts->max('commission_amount'),
+            'lowest_commission' => $contracts->min('commission_amount'),
+        ];
+
+        // Get monthly breakdown
+        $monthlyBreakdown = $contracts->groupBy(function($contract) {
+            return Carbon::parse($contract->contract_date)->format('Y-m');
+        })->map(function($monthContracts) {
+            return [
+                'count' => $monthContracts->count(),
+                'total' => $monthContracts->sum('commission_amount'),
+                'average' => $monthContracts->avg('commission_amount'),
+            ];
+        });
+
+        $filename = 'meine_vertraege_' . str_replace(' ', '_', $user->name) . '_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        
+        return Excel::download(new \App\Exports\SingleUserExport($user, $contracts, $stats, $monthlyBreakdown), $filename);
     }
 } 
