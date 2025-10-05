@@ -103,6 +103,24 @@
                         </div>
                     </div>
 
+                    <!-- Password Field -->
+                    <div class="border-t pt-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Passwort</h3>
+                        
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                                Passwort <span class="text-red-500">*</span>
+                            </label>
+                            <input type="password" 
+                                   name="password" 
+                                   id="password" 
+                                   value="{{ old('password') }}"
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                                   placeholder="Mindestens 6 Zeichen"
+                                   required>
+                        </div>
+                    </div>
+
                     <!-- Address -->
                     <div>
                         <label for="address" class="block text-sm font-medium text-gray-700 mb-2">

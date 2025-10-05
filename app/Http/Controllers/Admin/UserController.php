@@ -134,15 +134,13 @@ class UserController extends Controller
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'is_admin' => 'boolean',
+            'password' => 'required|min:6|max:255',
         ]);
 
-        // Geçici şifre oluştur
-        $temporaryPassword = Str::random(12);
-        
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($temporaryPassword),
+            'password' => Hash::make($request->password),
             'is_admin' => $request->has('is_admin'),
             'branch' => $request->branch,
             'phone' => $request->phone,
@@ -154,11 +152,11 @@ class UserController extends Controller
         \Log::info('New User Created', [
             'user_id' => $user->id,
             'email' => $user->email,
-            'temporary_password' => $temporaryPassword
+            'password_set_by_admin' => auth()->user()->name
         ]);
 
         return redirect()->route('admin.users.index')
-            ->with('success', "Benutzer '{$user->name}' wurde erfolgreich erstellt. Temporäres Passwort: {$temporaryPassword}");
+            ->with('success', "Benutzer '{$user->name}' wurde erfolgreich erstellt. Passwort wurde festgelegt.");
     }
 
     public function edit(User $user)
@@ -168,7 +166,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $request->validate([
+        $validationRules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'branch' => 'required|string|max:255',
@@ -176,9 +174,16 @@ class UserController extends Controller
             'address' => 'nullable|string',
             'is_admin' => 'boolean',
             'is_active' => 'boolean',
-        ]);
+        ];
 
-        $user->update([
+        // Eğer şifre değiştirilecekse validation kurallarını ekle
+        if ($request->has('change_password')) {
+            $validationRules['password'] = 'required|min:6|max:255';
+        }
+
+        $request->validate($validationRules);
+
+        $updateData = [
             'name' => $request->name,
             'email' => $request->email,
             'is_admin' => $request->has('is_admin'),
@@ -186,10 +191,31 @@ class UserController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'is_active' => $request->has('is_active'),
-        ]);
+        ];
+
+        // Şifre değiştirilecekse
+        if ($request->has('change_password')) {
+            $updateData['password'] = Hash::make($request->password);
+
+            // Log şifre değişikliği
+            \Log::info('User Password Changed', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'changed_by_admin' => auth()->user()->name
+            ]);
+        }
+
+        $user->update($updateData);
+
+        $successMessage = "Benutzer '{$user->name}' wurde erfolgreich aktualisiert.";
+        
+        // Eğer şifre değiştirildiyse mesaja ekle
+        if ($request->has('change_password')) {
+            $successMessage .= " Passwort wurde geändert.";
+        }
 
         return redirect()->route('admin.users.index')
-            ->with('success', "Benutzer '{$user->name}' wurde erfolgreich aktualisiert.");
+            ->with('success', $successMessage);
     }
 
     public function destroy(User $user)

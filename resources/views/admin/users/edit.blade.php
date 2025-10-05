@@ -128,6 +128,39 @@
                                   placeholder="Straße, Hausnummer, PLZ, Stadt">{{ old('address', $user->address) }}</textarea>
                     </div>
 
+                    <!-- Password Change Section -->
+                    <div class="border-t pt-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Passwort ändern</h3>
+                        
+                        <div class="space-y-4">
+                            <!-- Password Change Option -->
+                            <div>
+                                <label class="flex items-center">
+                                    <input type="checkbox" 
+                                           name="change_password" 
+                                           value="1"
+                                           {{ old('change_password') ? 'checked' : '' }}
+                                           id="change-password-checkbox"
+                                           class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500">
+                                    <span class="ml-2 text-sm text-gray-700">Passwort ändern</span>
+                                </label>
+                            </div>
+
+                            <!-- Password Field -->
+                            <div id="password-field" class="hidden">
+                                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Neues Passwort <span class="text-red-500">*</span>
+                                </label>
+                                <input type="password" 
+                                       name="password" 
+                                       id="password" 
+                                       value="{{ old('password') }}"
+                                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                                       placeholder="Mindestens 6 Zeichen">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Submit Button -->
                     <div class="flex justify-end space-x-4">
                         <a href="{{ route('admin.users.index') }}" 
@@ -143,4 +176,29 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const changePasswordCheckbox = document.getElementById('change-password-checkbox');
+            const passwordField = document.getElementById('password-field');
+            const passwordInput = document.getElementById('password');
+
+            function togglePasswordField() {
+                if (changePasswordCheckbox.checked) {
+                    passwordField.classList.remove('hidden');
+                    passwordInput.required = true;
+                } else {
+                    passwordField.classList.add('hidden');
+                    passwordInput.required = false;
+                    passwordInput.value = '';
+                }
+            }
+
+            // Add event listener
+            changePasswordCheckbox.addEventListener('change', togglePasswordField);
+
+            // Initialize on page load
+            togglePasswordField();
+        });
+    </script>
 </x-app-layout>
