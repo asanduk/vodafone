@@ -1,9 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\AnnouncementController;
 
 // Ana sayfa
 Route::get('/', function () {
@@ -22,6 +25,43 @@ Route::middleware([
     Route::get('/categories/{category}/subcategories', [ContractController::class, 'getSubcategories'])->name('categories.subcategories');
     Route::get('/categories/{category}/search-subcategories', [ContractController::class, 'searchSubcategories'])->name('categories.search-subcategories');
     Route::resource('contracts', ContractController::class);
+    
+    // Announcements - mark as read
+    Route::post('/announcements/mark-read', function (Request $request) {
+        $user = auth()->user();
+        $seenIds = $user->seen_announcements ?? [];
+        $newIds = $request->input('ids', []);
+        
+        $seenIds = array_unique(array_merge($seenIds, $newIds));
+        $user->seen_announcements = array_values($seenIds);
+        $user->save();
+        
+        return response()->json(['success' => true]);
+    })->name('announcements.mark-read');
+
+    // Dashboard layout save
+    Route::post('/dashboard/layout', function (Request $request) {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'string',
+        ]);
+        $user = auth()->user();
+        $user->dashboard_layout = $request->input('order');
+        $user->save();
+        return response()->json(['success' => true]);
+    })->name('dashboard.layout.save');
+
+    // Dashboard collapsed save
+    Route::post('/dashboard/collapsed', function (Request $request) {
+        $request->validate([
+            'collapsed' => 'required|array',
+            'collapsed.*' => 'string',
+        ]);
+        $user = auth()->user();
+        $user->dashboard_collapsed = $request->input('collapsed');
+        $user->save();
+        return response()->json(['success' => true]);
+    })->name('dashboard.collapsed.save');
 });
 
 // Admin rotaları
@@ -47,4 +87,11 @@ Route::group([
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     Route::delete('/users/{user}/force', [UserController::class, 'forceDelete'])->name('users.force-delete');
     Route::post('/users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
+
+    // Settings
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
+
+    // Announcements
+    Route::resource('announcements', AnnouncementController::class);
 });

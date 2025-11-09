@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\CategoryLevel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -69,11 +70,33 @@ class CategoryController extends Controller
             // Check if this is a main category (no parent_id)
             if ($category->parent_id === null) {
                 $validated = $request->validate([
-                    'commission_rate' => 'required|numeric|between:0,100'
+                    'commission_rate' => 'required|numeric|between:0,100',
+                    'level' => 'nullable|integer|min:1',
+                    'level_bonus_percent' => 'nullable|numeric|min:0|max:100',
+                    'level_activated_at' => 'nullable|date',
                 ]);
                 
                 $category->commission_rate = $validated['commission_rate'];
-                $message = "Provisionssatz für {$category->name} wurde aktualisiert";
+
+                // Append a new history row if any level-related fields are provided
+                $newLevel = $request->has('level') ? (int) $validated['level'] : (int) ($category->level ?? 1);
+                $newBonus = $request->has('level_bonus_percent') ? (float) $validated['level_bonus_percent'] : (float) ($category->level_bonus_percent ?? 0);
+                $newActivatedAt = $request->has('level_activated_at') ? $validated['level_activated_at'] : now();
+
+                if ($request->has('level') || $request->has('level_bonus_percent') || $request->has('level_activated_at')) {
+                    CategoryLevel::create([
+                        'category_id' => $category->id,
+                        'level' => max(1, $newLevel),
+                        'bonus_percent' => max(0, $newBonus),
+                        'activated_at' => $newActivatedAt,
+                    ]);
+
+                    // Update snapshot fields for current display
+                    $category->level = max(1, $newLevel);
+                    $category->level_bonus_percent = max(0, $newBonus);
+                    $category->level_activated_at = $newActivatedAt;
+                }
+                $message = "Provisionssatz/Level für {$category->name} wurde aktualisiert";
             } else {
                 $validated = $request->validate([
                     'base_commission' => 'required|numeric|min:0'
@@ -95,7 +118,10 @@ class CategoryController extends Controller
                 'data' => [
                     'id' => $category->id,
                     'base_commission' => $category->base_commission,
-                    'commission_rate' => $category->commission_rate
+                        'commission_rate' => $category->commission_rate,
+                        'level' => $category->level,
+                        'level_bonus_percent' => $category->level_bonus_percent,
+                        'level_activated_at' => optional($category->level_activated_at)->toDateTimeString(),
                 ]
             ]);
 

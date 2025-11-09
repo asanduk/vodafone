@@ -15,7 +15,16 @@ class Category extends Model
         'description',
         'parent_id',
         'base_commission',
-        'commission_rate'
+        'commission_rate',
+        'level',
+        'level_bonus_percent',
+        'level_activated_at'
+    ];
+
+    protected $casts = [
+        'level' => 'integer',
+        'level_bonus_percent' => 'float',
+        'level_activated_at' => 'datetime',
     ];
 
     public function contracts()
@@ -31,5 +40,10 @@ class Category extends Model
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function levels()
+    {
+        return $this->hasMany(CategoryLevel::class)->orderBy('activated_at');
     }
 } 

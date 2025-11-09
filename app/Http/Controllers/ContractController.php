@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\AppSetting;
+use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class ContractController extends Controller
 {
@@ -280,6 +283,211 @@ class ContractController extends Controller
                 return Carbon::createFromFormat('Y-m', $month)->format('M Y');
             })->toArray();
 
+            // Ranking settings and data (guard table missing)
+            try {
+                $settings = AppSetting::first();
+            } catch (\Throwable $e) {
+                $settings = null;
+            }
+            $ranking = collect();
+            if ($settings && $settings->show_ranking) {
+                $rankingQuery = User::query()
+                    ->select('id', 'name')
+                    ->where('is_active', true)
+                    ->withCount(['contracts as total_contracts'])
+                    ->withSum('contracts as total_commission', 'commission_amount')
+                    ->withSum(['contracts as monthly_commission' => function ($q) {
+                        $q->whereMonth('contract_date', now()->month)
+                          ->whereYear('contract_date', now()->year);
+                    }], 'commission_amount')
+                    ->orderByDesc('total_commission');
+
+                if (!$settings->include_admins_in_ranking) {
+                    $rankingQuery->where('is_admin', false);
+                }
+
+                $ranking = $rankingQuery->limit(10)->get();
+            }
+
+            // Admin earnings per contract (latest) when enabled
+            $adminEarningsContracts = collect();
+            if (auth()->user()->is_admin && $settings && ($settings->show_admin_earnings ?? true)) {
+                $levelsEnabled = (bool) ($settings->enable_category_levels ?? false);
+                $adminEarningsContracts = Contract::with(['category.parent', 'subcategory.parent'])
+                    ->orderByDesc('contract_date')
+                    ->limit(10)
+                    ->get()
+                    ->map(function ($c) use ($levelsEnabled) {
+                        $base = 0.0;
+                        if ($c->subcategory) {
+                            $base = (float) $c->subcategory->base_commission;
+                        } elseif ($c->category) {
+                            $base = (float) $c->category->base_commission;
+                        }
+
+                        // Determine main category via subcategory's parent when present
+                        $mainCategory = $c->subcategory && $c->subcategory->parent ? $c->subcategory->parent : ($c->category && $c->category->parent ? $c->category->parent : $c->category);
+                        $bonus = 0.0;
+                        if ($levelsEnabled && $mainCategory && ($mainCategory->level ?? 1) > 1) {
+                            // Determine effective level by contract date using history if exists
+                            $effective = $mainCategory->levels()
+                                ->where('activated_at', '<=', Carbon::parse($c->contract_date)->endOfDay())
+                                ->orderByDesc('activated_at')
+                                ->first();
+                            if ($effective && ($effective->level ?? 1) > 1) {
+                                $bonus = $base * (max(0.0, (float) ($effective->bonus_percent ?? 0)) / 100.0);
+                                $c->owner_level = (int) $effective->level;
+                            } else {
+                                $activatedAt = $mainCategory->level_activated_at ? Carbon::parse($mainCategory->level_activated_at) : null;
+                                if (!$activatedAt || Carbon::parse($c->contract_date)->greaterThanOrEqualTo($activatedAt->startOfDay())) {
+                                    $bonus = $base * (max(0.0, (float) ($mainCategory->level_bonus_percent ?? 0)) / 100.0);
+                                }
+                                $c->owner_level = (int) ($mainCategory->level ?? 1);
+                            }
+                        }
+
+                        // expose computed owner amount and bonus alongside original
+                        $c->owner_amount = $base + $bonus;
+                        $c->owner_bonus = $bonus;
+                        $c->owner_level = (int) ($c->owner_level ?? ($mainCategory->level ?? 1));
+                        return $c;
+                    });
+            }
+
+            // Admin monthly earnings grouped by category using base commission (Grundprovision) + optional level bonus in EUR
+            $adminCategoryEarnings = collect();
+            if (auth()->user()->is_admin && $settings && ($settings->show_admin_category_earnings ?? true)) {
+                $monthsWindow = max(1, (int) ($settings->admin_earnings_months_window ?? 12));
+                $startDate = Carbon::now()->startOfMonth()->subMonths($monthsWindow - 1);
+
+                $contracts = Contract::with(['category.parent', 'subcategory.parent'])
+                    ->whereDate('contract_date', '>=', $startDate)
+                    ->orderBy('contract_date', 'desc')
+                    ->get();
+
+                $adminCategoryEarnings = $contracts->groupBy(function ($c) {
+                    return Carbon::parse($c->contract_date)->format('Y-m');
+                })->map(function ($monthContracts) use ($settings) {
+                    $showSubs = (bool) ($settings->admin_earnings_show_subcategories ?? true);
+                    $levelsEnabled = (bool) ($settings->enable_category_levels ?? false);
+
+                    $categories = [];
+                    $monthContractsCount = 0;
+                    $monthBaseTotal = 0.0;
+                    $monthBonusTotal = 0.0;
+                    foreach ($monthContracts as $c) {
+                        $monthContractsCount++;
+                        // Determine main category via subcategory's parent when present
+                        $mainCategory = $c->subcategory && $c->subcategory->parent ? $c->subcategory->parent : ($c->category && $c->category->parent ? $c->category->parent : $c->category);
+                        $mainName = $mainCategory ? $mainCategory->name : 'Unbekannt';
+
+                        $base = 0.0;
+                        if ($c->subcategory) {
+                            $base = (float) $c->subcategory->base_commission; // EUR
+                        } elseif ($c->category) {
+                            $base = (float) $c->category->base_commission; // EUR
+                        }
+
+                        // Compute level bonus for owner if enabled and active for this contract date
+                        $bonus = 0.0;
+                        if ($levelsEnabled && $mainCategory) {
+                            // Determine effective level by contract date using history if exists
+                            $effective = $mainCategory->levels()
+                                ->where('activated_at', '<=', Carbon::parse($c->contract_date)->endOfDay())
+                                ->orderByDesc('activated_at')
+                                ->first();
+                            if ($effective && ($effective->level ?? 1) > 1) {
+                                $bonus = $base * (max(0.0, (float) ($effective->bonus_percent ?? 0)) / 100.0);
+                            } else if (($mainCategory->level ?? 1) > 1) {
+                                $activatedAt = $mainCategory->level_activated_at ? Carbon::parse($mainCategory->level_activated_at) : null;
+                                if (!$activatedAt || Carbon::parse($c->contract_date)->greaterThanOrEqualTo($activatedAt->startOfDay())) {
+                                    $bonus = $base * (max(0.0, (float) ($mainCategory->level_bonus_percent ?? 0)) / 100.0);
+                                }
+                            }
+                        }
+
+                        if (!isset($categories[$mainName])) {
+                            $categories[$mainName] = [
+                                'total' => 0.0,
+                                'count' => 0,
+                                'bonus_total' => 0.0,
+                                'level' => (int) ($mainCategory->level ?? 1),
+                                'level_count' => 0,
+                                'subcategories' => [],
+                            ];
+                        }
+
+                        $categories[$mainName]['total'] += ($base + $bonus);
+                        $categories[$mainName]['count'] += 1;
+                        $monthBaseTotal += $base;
+                        $categories[$mainName]['bonus_total'] += $bonus;
+                        $monthBonusTotal += $bonus;
+                        if ($bonus > 0) {
+                            $categories[$mainName]['level_count'] += 1;
+                        }
+
+                        if ($showSubs) {
+                            $subName = $c->subcategory ? $c->subcategory->name : ($c->category ? $c->category->name : '—');
+                            if (!isset($categories[$mainName]['subcategories'][$subName])) {
+                                $categories[$mainName]['subcategories'][$subName] = [
+                                    'total' => 0.0,
+                                    'count' => 0,
+                                    'bonus_total' => 0.0,
+                                    'level_count' => 0,
+                                ];
+                            }
+                            $categories[$mainName]['subcategories'][$subName]['total'] += ($base + $bonus);
+                            $categories[$mainName]['subcategories'][$subName]['count'] += 1;
+                            $categories[$mainName]['subcategories'][$subName]['bonus_total'] += $bonus;
+                            if ($bonus > 0) {
+                                $categories[$mainName]['subcategories'][$subName]['level_count'] += 1;
+                            }
+                        }
+                    }
+
+                    ksort($categories);
+                    if ($showSubs) {
+                        foreach ($categories as &$cat) {
+                            ksort($cat['subcategories']);
+                        }
+                    }
+
+                    return [
+                        'total' => (float) ($monthBaseTotal + $monthBonusTotal),
+                        'bonus_total' => (float) $monthBonusTotal,
+                        'count' => (int) $monthContractsCount,
+                        'categories' => $categories,
+                    ];
+                })->sortKeysDesc();
+            }
+
+            // Compute overall Grundprovision total across all contracts in EUR
+            $overallBaseTotal = Contract::with(['subcategory', 'category'])->get()->sum(function ($c) {
+                if ($c->subcategory) {
+                    return (float) $c->subcategory->base_commission;
+                }
+                if ($c->category) {
+                    return (float) $c->category->base_commission;
+                }
+                return 0.0;
+            });
+
+            // Get announcements and check which are unseen
+            $announcements = [];
+            $unseenAnnouncements = [];
+            try {
+                if (Storage::exists('announcements.json')) {
+                    $announcements = json_decode(Storage::get('announcements.json'), true) ?? [];
+                    $seenIds = auth()->user()->seen_announcements ?? [];
+                    $unseenAnnouncements = array_filter($announcements, fn($a) => !in_array($a['id'], $seenIds));
+                }
+            } catch (\Throwable $e) {
+                // Ignore
+            }
+
+            $dashboardLayout = auth()->user()->dashboard_layout ?? [];
+            $dashboardCollapsed = auth()->user()->dashboard_collapsed ?? [];
+
             return view('dashboard', compact(
                 'categories',
                 'totalCommission',
@@ -291,7 +499,16 @@ class ContractController extends Controller
                 'monthlyLabels',
                 'overallStats',
                 'overallMonthlyData',
-                'overallMonthlyLabels'
+                'overallMonthlyLabels',
+                'settings',
+                'ranking',
+                'adminEarningsContracts',
+                'adminCategoryEarnings',
+                'announcements',
+                'unseenAnnouncements',
+                'dashboardLayout',
+                'dashboardCollapsed',
+                'overallBaseTotal'
             ));
         } catch (\Exception $e) {
             return view('dashboard')->with('error', 'Daten konnten nicht geladen werden.');

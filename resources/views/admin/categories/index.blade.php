@@ -123,7 +123,7 @@
                             </div>
                         </div>
                         
-                        <!-- Main Category Commission Rate Form -->
+                        <!-- Main Category Commission & Level Form -->
                         <div class="mb-6 bg-white p-4 rounded-lg shadow-sm" id="main-category-container-{{ $mainCategory->id }}">
                             <form id="main-category-form-{{ $mainCategory->id }}" 
                                   action="{{ route('admin.categories.update', $mainCategory) }}" 
@@ -131,15 +131,31 @@
                                   class="commission-form">
                                 @csrf
                                 @method('PUT')
-                                <div class="flex items-center gap-4">
-                                    <label class="font-semibold text-gray-700">Provisionssatz für {{ $mainCategory->name }} (%):</label>
-                                    <input type="number" 
-                                           name="commission_rate" 
-                                           value="{{ $mainCategory->commission_rate }}" 
-                                           class="w-32 rounded border-gray-300"
-                                           step="0.01"
-                                           min="0"
-                                           max="100">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div>
+                                        <label class="font-semibold text-gray-700 block mb-1">Provisionssatz (%)</label>
+                                        <input type="number" 
+                                               name="commission_rate" 
+                                               value="{{ $mainCategory->commission_rate }}" 
+                                               class="w-full rounded border-gray-300"
+                                               step="0.01"
+                                               min="0"
+                                               max="100">
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-gray-700 block mb-1">Level</label>
+                                        <input type="number" name="level" min="1" value="{{ $mainCategory->level ?? 1 }}" class="w-full rounded border-gray-300">
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-gray-700 block mb-1">Level Bonus (%)</label>
+                                        <input type="number" name="level_bonus_percent" min="0" max="100" step="0.01" value="{{ number_format($mainCategory->level_bonus_percent ?? 0, 2, '.', '') }}" class="w-full rounded border-gray-300">
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-gray-700 block mb-1">Aktiv ab</label>
+                                        <input type="datetime-local" name="level_activated_at" value="{{ optional($mainCategory->level_activated_at)->format('Y-m-d\TH:i') }}" class="w-full rounded border-gray-300">
+                                    </div>
+                                </div>
+                                <div class="mt-4">
                                     <button type="submit" 
                                             class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                         Speichern

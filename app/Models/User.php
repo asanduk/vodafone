@@ -39,6 +39,9 @@ class User extends Authenticatable
         'address',
         'is_active',
         'last_login_at',
+        'seen_announcements',
+        'dashboard_layout',
+        'dashboard_collapsed',
     ];
 
     /**
@@ -74,6 +77,9 @@ class User extends Authenticatable
         'is_active' => 'boolean',
         'last_login_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'seen_announcements' => 'array',
+        'dashboard_layout' => 'array',
+        'dashboard_collapsed' => 'array',
     ];
 
     public function jobApplications()
